@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 typedef struct nodoListaAdyacencia{
-  int dato;
-  struct nodoListaAdyacencia* siguiente;
+  int destino; // vertice de destino
+  int peso; // costo del movimiento
+  struct nodoListaAdyacencia* siguiente; //siguiente nodo
 }nodoListaAdyacencia;
 
+//Adyacentes a determinado vértice 
 typedef struct listaAdyacencia{
-  nodoListaAdyacencia* inicio;
+  nodoListaAdyacencia* inicio; // inicio lista enlazada
 }listaAdyacencia;
 
 
@@ -29,7 +30,7 @@ void recorrerLista(listaAdyacencia * lista){
   if (!esListaVacia(lista)){
     nodoListaAdyacencia * auxiliar=lista->inicio;
     while (auxiliar!=NULL){
-      printf("%d ",auxiliar->dato);
+      printf("%d ",auxiliar->destino);
       auxiliar=auxiliar->siguiente;
     }
     printf("\n");
@@ -38,19 +39,11 @@ void recorrerLista(listaAdyacencia * lista){
     printf("La lista está vacía\n");
 }
 
-void insertarInicio(listaAdyacencia * lista, int dato){
+void insertarInicio(listaAdyacencia * lista, int destino, int peso){
   nodoListaAdyacencia * nuevo=(nodoListaAdyacencia*)malloc(sizeof(nodoListaAdyacencia));
-  nuevo->dato=dato;
+  nuevo->destino=destino;
+  nuevo->peso = peso;
   nuevo->siguiente = lista->inicio;
   lista->inicio=nuevo;
-}
-
-void eliminarInicio(listaAdyacencia * lista){
-  nodoListaAdyacencia* auxiliar;
-  if(!esListaVacia(lista)){
-    auxiliar=lista->inicio;
-    lista->inicio=lista->inicio->siguiente;
-    free(auxiliar);
-  }
 }
 

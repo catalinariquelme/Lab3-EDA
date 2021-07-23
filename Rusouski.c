@@ -7,23 +7,75 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <stdbool.h>
 
 #include "Grafo.h"
 #include "ListaAdyacencia.h"
 
+bool quedanSinVisitar(int visitado){
+
+}
+
+
+/*
+Entradas: matriz(información grafo),inicio(vértice inicio)
+Salida: -
+Objetivo: 
+*/
+int* dijkstra(matrizGrafo* grafo,int inicio){
+
+    int* visitado=(int*)malloc(sizeof(int)*grafo->vertices);
+    int* padre=(int*)malloc(sizeof(int)*grafo->vertices);
+    int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
+    int* distancia=(int*)malloc(sizeof(int)*grafo->vertices);
+
+    for(int i=0; i < grafo->vertices; i++){
+        visitado[i] = false;
+        padre[i] = NULL;
+        ruta[i] = 0;
+
+        if(A[inicio][i] > 0){
+            distancia[i] = W[inicio][i];
+        }
+        else{
+            distancia[i] = -1; //infinito
+        }
+    }
+
+    distancia[inicio] = -1; //infinito
+    visitado[inicio] = true;
+    int posicionRuta = 0;
+
+    while(quedanSinVisitar(visitado[n]) == true){
+        int minimo;
+        minimo = extraerMinimo(distancia,visitado);
+        visitado[minimo] = true;
+        listaAdyacencia* listaAdy = crearListaVacia();
+        listaAdy = obtenerAdyacentes(grafo,minimo);
+        listaAdyacencia* aux = listaAdy;
+
+        while(aux != NULL){
+            if(distancia[aux->inicio->peso] > distancia[minimo] + W[minimo,aux->inicio->peso]){
+                distancia[aux->inicio->peso] = distancia[minimo] + W[minimo,aux->inicio->peso];
+                padre[aux->inicio->peso] = minimo;
+            }
+            aux = aux->inicio->siguiente;
+        }
+        ruta[posicionRuta] = minimo;
+        posicionRuta++;
+    }
+    return ruta;
+}
+	
+	
+	
+
+
+int main(){
+	char* archivo= "conexiones.in";
+	return 0;
+}
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-// https://www.geeksforgeeks.org/dijkstras-algorithm-for-adjacency-list-representation-greedy-algo-8/
