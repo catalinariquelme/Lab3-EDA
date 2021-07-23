@@ -39,10 +39,9 @@ void recorrerLista(listaAdyacencia * lista){
     printf("La lista está vacía\n");
 }
 
-void insertarInicio(listaAdyacencia * lista, int destino, int peso){
+void insertarInicio(listaAdyacencia * lista, int destino){
   nodoListaAdyacencia * nuevo=(nodoListaAdyacencia*)malloc(sizeof(nodoListaAdyacencia));
   nuevo->destino=destino;
-  nuevo->peso = peso;
   nuevo->siguiente = lista->inicio;
   lista->inicio=nuevo;
 }

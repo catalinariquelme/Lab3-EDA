@@ -12,10 +12,6 @@
 #include "Grafo.h"
 #include "ListaAdyacencia.h"
 
-bool quedanSinVisitar(int visitado){
-
-}
-
 
 /*
 Entradas: matriz(información grafo),inicio(vértice inicio)
@@ -23,12 +19,14 @@ Salida: -
 Objetivo: 
 */
 int* dijkstra(matrizGrafo* grafo,int inicio){
-
+    //Se almacenan los vértices ya visitados
     int* visitado=(int*)malloc(sizeof(int)*grafo->vertices);
     int* padre=(int*)malloc(sizeof(int)*grafo->vertices);
+    int* distancia=(int*)malloc(sizeof(int)*grafo->vertices); // o costo
     int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
-    int* distancia=(int*)malloc(sizeof(int)*grafo->vertices);
 
+    int** A = grafo->adyacencias;
+    int** W = grafo->adyacencias;
     for(int i=0; i < grafo->vertices; i++){
         visitado[i] = false;
         padre[i] = NULL;
@@ -38,6 +36,7 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
             distancia[i] = W[inicio][i];
         }
         else{
+            //inicialmente parte en infinito
             distancia[i] = -1; //infinito
         }
     }
