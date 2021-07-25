@@ -49,8 +49,17 @@ Entradas: distancia (int*),visitado(int*)
 Salida: int
 Objetivo: 
 */
-int extraerMinimo(int* distancia,int* visitado){
+int extraerMinimo(int* distancia,int* visitado, int largo){
+    int minimo,idMinimo;
+    minimo = 99999999;
 
+    for(int i=0; i< largo;i++){
+        if(distancia[i] < minimo && visitado[i] == 0){
+            minimo = distancia[i];
+            idMinimo = i;
+        }
+    }
+    return idMinimo;
 }
 
 /*
@@ -58,7 +67,7 @@ Entradas: matriz(información grafo),inicio(vértice inicio)
 Salida: -
 Objetivo: 
 */
-/*
+
 int* dijkstra(matrizGrafo* grafo,int inicio){
     //Se almacenan los vértices ya visitados
     int* visitado=(int*)malloc(sizeof(int)*grafo->vertices);
@@ -70,7 +79,7 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
     int** W = grafo->adyacencias;
     for(int i=0; i < grafo->vertices; i++){
         visitado[i] = 0; // 0 = no visitado
-        padre[i] = NULL;
+        padre[i] = -1; //NULL
         ruta[i] = 0;
 
         if(A[inicio][i] > 0){
@@ -87,16 +96,16 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
 
     while(esVacioVisitados(visitado,grafo) == 0){
         int minimo;
-        minimo = extraerMinimo(distancia,visitado);
+        minimo = extraerMinimo(distancia,visitado,grafo->vertices);
         visitado[minimo] = 1;
         listaAdyacencia* listaAdy = crearListaVacia();
         listaAdy = obtenerAdyacentes(grafo,minimo);
         listaAdyacencia* aux = listaAdy;
 
         while(aux != NULL){
-            if(distancia[aux->inicio->peso] > distancia[minimo] + W[minimo,aux->inicio->peso]){
-                distancia[aux->inicio->peso] = distancia[minimo] + W[minimo,aux->inicio->peso];
-                padre[aux->inicio->peso] = minimo;
+            if(distancia[aux->inicio->dato] > distancia[minimo] + W[minimo,aux->inicio->dato]){
+                distancia[aux->inicio->dato] = distancia[minimo] + W[minimo,aux->inicio->dato];
+                padre[aux->inicio->dato] = minimo;
             }
             aux = aux->inicio->siguiente;
         }
@@ -105,9 +114,6 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
     }
     return ruta;
 }
-	
-*/
-	
 
 
 int main(){
@@ -119,6 +125,7 @@ int main(){
     grafo = lecturaGrafo(archivo);
     printf("Matriz adyacencia\n");
     imprimirMatrizAdyacencia(grafo);
+
 
 	return 0;
 }

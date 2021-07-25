@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 typedef struct nodoListaAdyacencia{
-  int destino; // vertice de destino
+  int dato; 
   struct nodoListaAdyacencia* siguiente; //siguiente nodo
 }nodoListaAdyacencia;
 
@@ -17,6 +17,7 @@ listaAdyacencia* crearListaVacia(){
   return lista;
 }
 
+
 int esListaVacia(listaAdyacencia * lista){
   if (lista->inicio == NULL)
     return 1;
@@ -24,11 +25,18 @@ int esListaVacia(listaAdyacencia * lista){
     return 0;
 }
 
+void insertarInicio(listaAdyacencia* lista, int dato){
+  nodoListaAdyacencia* nuevo=(nodoListaAdyacencia*)malloc(sizeof(nodoListaAdyacencia));
+  nuevo->dato = dato;
+  nuevo->siguiente = lista->inicio;
+  lista->inicio=nuevo;
+}
+
 void recorrerLista(listaAdyacencia * lista){
   if (!esListaVacia(lista)){
     nodoListaAdyacencia * auxiliar=lista->inicio;
     while (auxiliar!=NULL){
-      printf("%d ",auxiliar->destino);
+      printf("%d ",auxiliar->dato);
       auxiliar=auxiliar->siguiente;
     }
     printf("\n");
@@ -37,9 +45,4 @@ void recorrerLista(listaAdyacencia * lista){
     printf("La lista está vacía\n");
 }
 
-void insertarInicio(listaAdyacencia * lista, int destino){
-  nodoListaAdyacencia * nuevo=(nodoListaAdyacencia*)malloc(sizeof(nodoListaAdyacencia));
-  nuevo->destino=destino;
-  nuevo->siguiente = lista->inicio;
-  lista->inicio=nuevo;
-}
+
