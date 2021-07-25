@@ -3,7 +3,6 @@
 
 typedef struct nodoListaAdyacencia{
   int destino; // vertice de destino
-  int peso; // costo del movimiento
   struct nodoListaAdyacencia* siguiente; //siguiente nodo
 }nodoListaAdyacencia;
 
@@ -11,7 +10,6 @@ typedef struct nodoListaAdyacencia{
 typedef struct listaAdyacencia{
   nodoListaAdyacencia* inicio; // inicio lista enlazada
 }listaAdyacencia;
-
 
 listaAdyacencia* crearListaVacia(){
   listaAdyacencia * lista=(listaAdyacencia*)malloc(sizeof(listaAdyacencia));
@@ -45,4 +43,3 @@ void insertarInicio(listaAdyacencia * lista, int destino){
   nuevo->siguiente = lista->inicio;
   lista->inicio=nuevo;
 }
-
