@@ -49,8 +49,8 @@ Objetivo: obtener adyacentes de un vértice
 listaAdyacencia* obtenerAdyacentes(matrizGrafo* grafo, int vertice){
 	listaAdyacencia* lista = crearListaVacia();
 	for(int i=0;i < grafo->vertices;i++){
-		if(adyacenciaNodos(grafo,vertice,i)){
-			insertarInicio(lista,i+1);
+		if(grafo->adyacencias[vertice][i]!=0){
+			insertarInicio(lista,i);
 		}
 	}
 	return lista;

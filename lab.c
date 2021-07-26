@@ -54,7 +54,7 @@ int extraerMinimo(int* distancia,int* visitado, int largo){
     minimo = 99999999;
 
     for(int i=0; i< largo;i++){
-        if(distancia[i] < minimo && visitado[i] == 0){
+        if(distancia[i] < minimo && visitado[i] == 0 && distancia[i]!= -1){
             minimo = distancia[i];
             idMinimo = i;
         }
@@ -67,8 +67,8 @@ Entradas: matriz(información grafo),inicio(vértice inicio)
 Salida: -
 Objetivo: 
 */
-
 int* dijkstra(matrizGrafo* grafo,int inicio){
+    printf("\nVertice inicial: %d\n",inicio);
     //Se almacenan los vértices ya visitados
     int* visitado=(int*)malloc(sizeof(int)*grafo->vertices);
     int* padre=(int*)malloc(sizeof(int)*grafo->vertices);
@@ -77,6 +77,7 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
 
     int** A = grafo->adyacencias;
     int** W = grafo->adyacencias;
+
     for(int i=0; i < grafo->vertices; i++){
         visitado[i] = 0; // 0 = no visitado
         padre[i] = -1; //NULL
@@ -90,31 +91,66 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
             distancia[i] = -1; //infinito
         }
     }
-    distancia[inicio] = -1; //infinito
-    visitado[inicio] = 1; // 1 = visitado
+    //La distancia mínima para el vértice inical es 0
+    distancia[inicio] = 0;
+    //Se marca el vertice inicial como alcanzado (1)
+    visitado[inicio] = 1;
     int posicionRuta = 0;
 
+    printf("Visitados:");
+    for(int i=0;i<grafo->vertices;i++){
+        printf("%d,",visitado[i]);
+    }
+    printf("\n");
+
+    printf("Distancia:");
+    for(int i=0;i<grafo->vertices;i++){
+        printf("%d,",distancia[i]);
+    }
+    printf("\n\n");
+
+    //Mientras queden vértices por visitar
     while(esVacioVisitados(visitado,grafo) == 0){
         int minimo;
+        //Se escoge el vértice no visitado con distancia más baja
         minimo = extraerMinimo(distancia,visitado,grafo->vertices);
+        printf("Minimo extraido: %d\n",minimo);
+        //Se marca como visitado el vértice escogido
         visitado[minimo] = 1;
         listaAdyacencia* listaAdy = crearListaVacia();
+        //Se obtienen los adyacentes de este
         listaAdy = obtenerAdyacentes(grafo,minimo);
-        listaAdyacencia* aux = listaAdy;
+        printf("Adyacentes: ");
+        recorrerLista(listaAdy);
+        nodoListaAdyacencia* aux = listaAdy->inicio;
 
+        //Para el vértice actual, se calcula la distancia para llegar a cada uno de sus vecinos
         while(aux != NULL){
-            if(distancia[aux->inicio->dato] > distancia[minimo] + W[minimo,aux->inicio->dato]){
-                distancia[aux->inicio->dato] = distancia[minimo] + W[minimo,aux->inicio->dato];
-                padre[aux->inicio->dato] = minimo;
+            if(distancia[aux->dato] > distancia[minimo] + *W[minimo,aux->dato]){
+                distancia[aux->dato] = distancia[minimo] + *W[minimo,aux->dato];
+                padre[aux->dato] = minimo;
             }
-            aux = aux->inicio->siguiente;
+            aux = aux->siguiente;
         }
         ruta[posicionRuta] = minimo;
         posicionRuta++;
+
+        printf("Visitados:");
+        for(int i=0;i<grafo->vertices;i++){
+            printf("%d,",visitado[i]);
+        }
+        printf("\n");
+
+        printf("Distancia:");
+        for(int i=0;i<grafo->vertices;i++){
+            printf("%d,",distancia[i]);
+        }
+        printf("\n\n");
+
     }
+    printf("Tengo la ruta\n");
     return ruta;
 }
-
 
 int main(){
 	char* archivo= "conexiones.in";
@@ -126,7 +162,11 @@ int main(){
     printf("Matriz adyacencia\n");
     imprimirMatrizAdyacencia(grafo);
 
+    int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
 
+    ruta = dijkstra(grafo,0);
+    
+    printf("Sali Dijkstra\n");
 	return 0;
 }
 
