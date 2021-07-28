@@ -70,7 +70,7 @@ int esVacioVisitados(int* visitados, matrizGrafo* grafo){
 /*
 Entradas: distancia (int*),visitado(int*)
 Salida: int
-Objetivo: 
+Objetivo: extaer distancia mínima
 */
 int extraerMinimo(int* distancia,int* visitado, int largo){
     int minimo,idMinimo;
@@ -89,7 +89,7 @@ int extraerMinimo(int* distancia,int* visitado, int largo){
 /*
 Entradas: matriz(información grafo),inicio(vértice inicio)
 Salida: -
-Objetivo: 
+Objetivo: calcular camino mínimo
 */
 int* dijkstra(matrizGrafo* grafo,int inicio){
     //Se almacenan los vértices ya visitados
@@ -148,7 +148,7 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
 
 /*
 Entradas: distancia(int), peso(int), subsidio(int)
-Salida: -
+Salida: costo (int)
 Objetivo: calcular el costo
 */
 int calculoCosto(int distancia,int peso,int subsidio){
@@ -159,6 +159,11 @@ int calculoCosto(int distancia,int peso,int subsidio){
     return costo;
 }
 
+/*
+Entradas: capacidad(int*), vertices(int)
+Salida: capacidadTotal (int)
+Objetivo: calcular capacidad total, sumando cada una
+*/
 int calculoCapacidad(int*capacidad,int vertices){
     int capacidadTotal = 0;
     for(int i=0;i<vertices ;i++){
@@ -167,6 +172,11 @@ int calculoCapacidad(int*capacidad,int vertices){
     return capacidadTotal;
 }
 
+/*
+Entradas: ruta(int*),grafo(matrizGrafo*),inicio(int* vértice por el cual se comienza)
+Salida: distancia (int)
+Objetivo: calcular la distancia recorrida al seguir una determinada ruta
+*/
 int calculoDistancia(int*ruta,matrizGrafo* grafo,int inicio){
     int distancia = 0;
     int** matriz = grafo->adyacencias;
@@ -177,12 +187,22 @@ int calculoDistancia(int*ruta,matrizGrafo* grafo,int inicio){
     return distancia;
 }
 
+/*
+Entradas: ruta(int*),capacidad(int*,grafo(matrizGrafo*),capacidadTotal(int),inicio(int* vértice por el cual se comienza)
+Salida: distancia (int)
+Objetivo: calcular la distancia recorrida al seguir una determinada ruta
+*/
 int calculoPeso(int*ruta,int*capacidad,matrizGrafo* grafo,int capacidadTotal,int inicio){
     for(int i=0;i < grafo->vertices-1 ;i++){
         capacidadTotal = capacidadTotal - 1;
     }
 }
 
+/*
+Entradas: capacidadTotal(int), subsidio(int),ruta(int* ruta mínima), grafo(matrizGrafo*)
+Salida: -
+Objetivo: escribir un archivo con la información requerida
+*/
 void salidaArchivo(int capacidadTotal,int subsidio,int* ruta,matrizGrafo *grafo){
   FILE* arch;
   arch = fopen("salida.out","w");
@@ -216,51 +236,41 @@ int main(){
     //clock_t start, finish, duration;
     //start = clock();
 
+    //Se lee el archivo conexiones con el fin de obtener la cantidad de vértices
+    int vertices = lecturaVertices("conexiones.in");
+    matrizGrafo* grafo = crearGrafoVacio(vertices);
+    //Se lee el archivo con el fin de almacenas la información del grafo
+    grafo = lecturaGrafo("conexiones.in");
 
-    //Archivo que contiene las conexiones del grafo
-	char* archivo= "conexiones.in";
-    int vertices = lecturaVertices(archivo);
-    //printf("Vertices: %d\n",vertices);
+    //Se define el vértice inicial
+    int verticeInicial = 0;
+    int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
+    //Se llama la función Dijkstra con la finalidad de obtener el camino mínimo
+    ruta = dijkstra(grafo,verticeInicial);
+    int distanciaRecorrida;
+    distanciaRecorrida = calculoDistancia(ruta,grafo,verticeInicial);
 
+
+    //Se lee el archivo insumos con la finalidad de obtener la información respecto a esta
     int subsidio;
     int *capacidad = (int*)malloc(sizeof(int)*vertices);
     for(int i=0;i<vertices ;i++){
         capacidad[i] = 0;
     }
-
-
     subsidio = lecturaInsumos("insumos.in",capacidad,subsidio);
+
+    //Se calcula la capacidad llamando a la función calculoCapacidad
     int capacidadTotal;
     capacidadTotal= calculoCapacidad(capacidad,vertices);
-
-
-    matrizGrafo* grafo = crearGrafoVacio(vertices);
-    grafo = lecturaGrafo(archivo);
-    //printf("Matriz adyacencia\n");
-    //imprimirMatrizAdyacencia(grafo);
-
-    
-
-
-
-
-
-    //Se define el vértice inicial
-    int verticeInicial = 0;
-    int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
-    ruta = dijkstra(grafo,verticeInicial);
-    int distanciaRecorrida;
-    distanciaRecorrida = calculoDistancia(ruta,grafo,0);
-
 
     int costoTotal;
     costoTotal = calculoCosto(distanciaRecorrida,capacidadTotal,subsidio);
 
 
-
-    printf("Capacidad: %d ton\n",capacidadTotal);
+    //Se muestra por pantalla la información solicitada
+    printf("\nCapacidad: %d ton\n",capacidadTotal);
     printf("Subsidio: %d um\n",subsidio);
-    printf("\nCosto: %d\n",costoTotal);
+    printf("Coste minimo: %d\n",costoTotal);
     printf("Ruta: ");
     printf("Centro");
     for(int i=0;i<grafo->vertices ;i++){
@@ -269,9 +279,6 @@ int main(){
         }
         printf("->%d",ruta[i]);
     }
-
-
-
     //Se impime la información mostrada por pantalla
     salidaArchivo(capacidadTotal,subsidio,ruta,grafo);
 
@@ -279,5 +286,3 @@ int main(){
     //printf("process() took %f seconds to execute\n", ((double) (finish - start)) / CLOCKS_PER_SEC );
 	return 0;
 }
-
-
