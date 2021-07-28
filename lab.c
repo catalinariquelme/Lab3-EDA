@@ -12,6 +12,34 @@
 #include "Grafo.h"
 
 /*
+Entradas: nombre (nombre archivo a leer),insumos(int**)
+Salida: vertices
+Objetivo: leer la cantidad de vertices en un archivo
+*/
+int lecturaInsumos(char* nombre,int** insumos){
+    FILE* arch;
+    arch = fopen(nombre,"r");
+    if(arch == NULL){
+        printf("No existe el archivo\n");
+        exit(1);
+    }
+    int centroTotales,subsidio;
+    fscanf(arch,"%d %d",&centroTotales,&subsidio);
+
+    int i=0;
+    while(feof(arch) == 0){
+        int idCentro,capacidad;
+        fscanf(arch,"%d %d",&idCentro,&capacidad);
+        for(int j=0;j<1;j++){
+            insumos[i][j]=idCentro;
+            insumos[i][j+1]=capacidad;
+        }
+    }
+    fclose(arch);
+    return subsidio;
+}
+
+/*
 Entradas: nombre (nombre archivo a leer)
 Salida: vertices
 Objetivo: leer la cantidad de vertices en un archivo
@@ -29,7 +57,6 @@ int lecturaVertices(char* nombre){
     return vertices;
 }
 
-
 /*
 Entradas: visitados(int*), grafo
 Salida: 1 (esta vácio) | 0 (no esta vácio)
@@ -37,7 +64,7 @@ Objetivo: verificar si visitados se encuentra vácio
 */
 int esVacioVisitados(int* visitados, matrizGrafo* grafo){
     for(int i=0;i<grafo->vertices;i++){
-        if(visitados[i] == 1){
+        if(visitados[i] == 0){
             return 0;
         }
     }
@@ -51,12 +78,13 @@ Objetivo:
 */
 int extraerMinimo(int* distancia,int* visitado, int largo){
     int minimo,idMinimo;
-    minimo = 99999999;
-
+    minimo = 999999999;
     for(int i=0; i< largo;i++){
-        if(distancia[i] < minimo && visitado[i] == 0 && distancia[i]!= -1){
+        if(distancia[i] < minimo && visitado[i] == 0){
             minimo = distancia[i];
+            
             idMinimo = i;
+            //printf("Id: %d\n",idMinimo);
         }
     }
     return idMinimo;
@@ -81,14 +109,13 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
     for(int i=0; i < grafo->vertices; i++){
         visitado[i] = 0; // 0 = no visitado
         padre[i] = -1; //NULL
-        ruta[i] = 0;
 
         if(A[inicio][i] > 0){
             distancia[i] = W[inicio][i];
         }
         else{
             //inicialmente parte en infinito
-            distancia[i] = -1; //infinito
+            distancia[i] = 99999999; //infinito
         }
     }
     //La distancia mínima para el vértice inical es 0
@@ -107,6 +134,7 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
     for(int i=0;i<grafo->vertices;i++){
         printf("%d,",distancia[i]);
     }
+    printf("\n----------------------------");
     printf("\n\n");
 
     //Mientras queden vértices por visitar
@@ -120,17 +148,25 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
         listaAdyacencia* listaAdy = crearListaVacia();
         //Se obtienen los adyacentes de este
         listaAdy = obtenerAdyacentes(grafo,minimo);
+
         printf("Adyacentes: ");
         recorrerLista(listaAdy);
-        nodoListaAdyacencia* aux = listaAdy->inicio;
 
+        nodoListaAdyacencia* aux = listaAdy->inicio;
         //Para el vértice actual, se calcula la distancia para llegar a cada uno de sus vecinos
+        int i = 0;
         while(aux != NULL){
-            if(distancia[aux->dato] > distancia[minimo] + *W[minimo,aux->dato]){
-                distancia[aux->dato] = distancia[minimo] + *W[minimo,aux->dato];
+            int peso;
+            peso = W[minimo][aux->dato];
+            printf("i: %d    peso: %d\n",aux->dato,peso);
+            
+            if(distancia[aux->dato] > (distancia[minimo] + peso)){
+                //printf("Entre\n");
+                distancia[aux->dato] = distancia[minimo] + peso;
                 padre[aux->dato] = minimo;
             }
             aux = aux->siguiente;
+            i++;
         }
         ruta[posicionRuta] = minimo;
         posicionRuta++;
@@ -145,6 +181,7 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
         for(int i=0;i<grafo->vertices;i++){
             printf("%d,",distancia[i]);
         }
+        printf("\n----------------------------");
         printf("\n\n");
 
     }
@@ -156,6 +193,9 @@ int main(){
 	char* archivo= "conexiones.in";
     printf("Lectura grafos\n\n");
     int vertices = lecturaVertices(archivo);
+    //int**insumos = (int**)malloc(vertices-1*sizeof(int*));
+
+
     printf("Vertices: %d\n",vertices);
     matrizGrafo* grafo = crearGrafoVacio(vertices);
     grafo = lecturaGrafo(archivo);
@@ -165,8 +205,12 @@ int main(){
     int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
 
     ruta = dijkstra(grafo,0);
-    
-    printf("Sali Dijkstra\n");
+
+    printf("0,");
+    for(int i=0;i<grafo->vertices-1 ;i++){
+        printf("%d,",ruta[i]);
+    }
+    printf("\nSali Dijkstra\n");
 	return 0;
 }
 

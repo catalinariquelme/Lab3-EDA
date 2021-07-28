@@ -89,7 +89,7 @@ matrizGrafo* lecturaGrafo(char *nombreArchivo){
 	for(int k=0; k<aristas;k++){
 		fscanf(arch,"%d %d %d",&i, &j, &peso);
 		grafo->adyacencias[i][j] = peso;
-		//grafo->adyacencias[j][i] = 1; // No considerar si es dirigido
+		grafo->adyacencias[j][i] = peso; // No considerar si es dirigido
 	}
 	fclose(arch);
 	return  grafo;	
