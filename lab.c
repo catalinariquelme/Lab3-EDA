@@ -183,6 +183,35 @@ int calculoPeso(int*ruta,int*capacidad,matrizGrafo* grafo,int capacidadTotal,int
     }
 }
 
+void salidaArchivo(int capacidadTotal,int subsidio,int* ruta,matrizGrafo *grafo){
+  FILE* arch;
+  arch = fopen("salida.out","w");
+
+    fputs("Capacidad: ",arch);
+    char buffer[20];
+    itoa(capacidadTotal,buffer,10);
+    fputs(buffer,arch);
+    fputs(" ton\n",arch);
+
+    fputs("Subsidio: ",arch);
+    itoa(subsidio,buffer,10);
+    fputs(buffer,arch);
+    fputs(" um\n",arch);
+
+    fputs("Ruta: Centro",arch);
+
+    for(int i=0;i< grafo->vertices;i++){
+        if (ruta[i] == 0){
+            break;
+        }
+        fputs("->",arch);
+        itoa(ruta[i],buffer,10);
+        fputs(buffer,arch);
+    }
+
+  fclose(arch);
+}
+
 int main(){
     //clock_t start, finish, duration;
     //start = clock();
@@ -191,7 +220,7 @@ int main(){
     //Archivo que contiene las conexiones del grafo
 	char* archivo= "conexiones.in";
     int vertices = lecturaVertices(archivo);
-    printf("Vertices: %d\n",vertices);
+    //printf("Vertices: %d\n",vertices);
 
     int subsidio;
     int *capacidad = (int*)malloc(sizeof(int)*vertices);
@@ -204,12 +233,11 @@ int main(){
     int capacidadTotal;
     capacidadTotal= calculoCapacidad(capacidad,vertices);
 
-    //int nuevaCapacidad =
 
     matrizGrafo* grafo = crearGrafoVacio(vertices);
     grafo = lecturaGrafo(archivo);
-    printf("Matriz adyacencia\n");
-    imprimirMatrizAdyacencia(grafo);
+    //printf("Matriz adyacencia\n");
+    //imprimirMatrizAdyacencia(grafo);
 
     
 
@@ -227,16 +255,26 @@ int main(){
 
     int costoTotal;
     costoTotal = calculoCosto(distanciaRecorrida,capacidadTotal,subsidio);
-    printf("\nCosto: %d\n",costoTotal);
+
 
 
     printf("Capacidad: %d ton\n",capacidadTotal);
     printf("Subsidio: %d um\n",subsidio);
-    printf("\nRuta: ");
-    printf("%d->",verticeInicial);
-    for(int i=0;i<grafo->vertices-1 ;i++){
-        printf("%d->",ruta[i]);
+    printf("\nCosto: %d\n",costoTotal);
+    printf("Ruta: ");
+    printf("Centro");
+    for(int i=0;i<grafo->vertices ;i++){
+        if (ruta[i]==0){
+            break;
+        }
+        printf("->%d",ruta[i]);
     }
+
+
+
+    //Se impime la información mostrada por pantalla
+    salidaArchivo(capacidadTotal,subsidio,ruta,grafo);
+
     //finish = clock();
     //printf("process() took %f seconds to execute\n", ((double) (finish - start)) / CLOCKS_PER_SEC );
 	return 0;
