@@ -7,33 +7,29 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <time.h>
 
 #include "Grafo.h"
 
 /*
-Entradas: nombre (nombre archivo a leer),insumos(int**)
-Salida: vertices
-Objetivo: leer la cantidad de vertices en un archivo
+Entradas: nombre (nombre archivo a leer),capacidadArr(int*), subsidio(int)
+Salida: subsidio (int)
+Objetivo: leer la capacidad y subsidio de los vértices
 */
-int lecturaInsumos(char* nombre,int** insumos){
+int lecturaInsumos(char* nombre,int* capacidadArr,int subsidio){
     FILE* arch;
     arch = fopen(nombre,"r");
     if(arch == NULL){
         printf("No existe el archivo\n");
         exit(1);
     }
-    int centroTotales,subsidio;
+    int centroTotales;
     fscanf(arch,"%d %d",&centroTotales,&subsidio);
 
-    int i=0;
     while(feof(arch) == 0){
         int idCentro,capacidad;
         fscanf(arch,"%d %d",&idCentro,&capacidad);
-        for(int j=0;j<1;j++){
-            insumos[i][j]=idCentro;
-            insumos[i][j+1]=capacidad;
-        }
+        capacidadArr[idCentro]=capacidad;
     }
     fclose(arch);
     return subsidio;
@@ -96,7 +92,6 @@ Salida: -
 Objetivo: 
 */
 int* dijkstra(matrizGrafo* grafo,int inicio){
-    printf("\nVertice inicial: %d\n",inicio);
     //Se almacenan los vértices ya visitados
     int* visitado=(int*)malloc(sizeof(int)*grafo->vertices);
     int* padre=(int*)malloc(sizeof(int)*grafo->vertices);
@@ -104,17 +99,15 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
     int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
 
     int** A = grafo->adyacencias;
-    int** W = grafo->adyacencias;
 
     for(int i=0; i < grafo->vertices; i++){
         visitado[i] = 0; // 0 = no visitado
         padre[i] = -1; //NULL
 
         if(A[inicio][i] > 0){
-            distancia[i] = W[inicio][i];
+            distancia[i] = A[inicio][i];
         }
         else{
-            //inicialmente parte en infinito
             distancia[i] = 99999999; //infinito
         }
     }
@@ -124,96 +117,129 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
     visitado[inicio] = 1;
     int posicionRuta = 0;
 
-    printf("Visitados:");
-    for(int i=0;i<grafo->vertices;i++){
-        printf("%d,",visitado[i]);
-    }
-    printf("\n");
-
-    printf("Distancia:");
-    for(int i=0;i<grafo->vertices;i++){
-        printf("%d,",distancia[i]);
-    }
-    printf("\n----------------------------");
-    printf("\n\n");
-
     //Mientras queden vértices por visitar
     while(esVacioVisitados(visitado,grafo) == 0){
         int minimo;
         //Se escoge el vértice no visitado con distancia más baja
         minimo = extraerMinimo(distancia,visitado,grafo->vertices);
-        printf("Minimo extraido: %d\n",minimo);
         //Se marca como visitado el vértice escogido
         visitado[minimo] = 1;
         listaAdyacencia* listaAdy = crearListaVacia();
         //Se obtienen los adyacentes de este
         listaAdy = obtenerAdyacentes(grafo,minimo);
 
-        printf("Adyacentes: ");
-        recorrerLista(listaAdy);
-
         nodoListaAdyacencia* aux = listaAdy->inicio;
         //Para el vértice actual, se calcula la distancia para llegar a cada uno de sus vecinos
-        int i = 0;
         while(aux != NULL){
             int peso;
-            peso = W[minimo][aux->dato];
-            printf("i: %d    peso: %d\n",aux->dato,peso);
+            peso = A[minimo][aux->dato];
             
             if(distancia[aux->dato] > (distancia[minimo] + peso)){
-                //printf("Entre\n");
                 distancia[aux->dato] = distancia[minimo] + peso;
                 padre[aux->dato] = minimo;
             }
             aux = aux->siguiente;
-            i++;
         }
         ruta[posicionRuta] = minimo;
         posicionRuta++;
-
-        printf("Visitados:");
-        for(int i=0;i<grafo->vertices;i++){
-            printf("%d,",visitado[i]);
-        }
-        printf("\n");
-
-        printf("Distancia:");
-        for(int i=0;i<grafo->vertices;i++){
-            printf("%d,",distancia[i]);
-        }
-        printf("\n----------------------------");
-        printf("\n\n");
-
     }
-    printf("Tengo la ruta\n");
     return ruta;
 }
 
+/*
+Entradas: distancia(int), peso(int), subsidio(int)
+Salida: -
+Objetivo: calcular el costo
+*/
+int calculoCosto(int distancia,int peso,int subsidio){
+    int costo;
+    printf("D: %d   peso: %d    sub: %d\n",distancia,peso,subsidio);
+    costo = (distancia*peso)/subsidio;
+    printf("aaa: %d\n",costo);
+    return costo;
+}
+
+int calculoCapacidad(int*capacidad,int vertices){
+    int capacidadTotal = 0;
+    for(int i=0;i<vertices ;i++){
+        capacidadTotal = capacidadTotal + capacidad[i];
+    }
+    return capacidadTotal;
+}
+
+int calculoDistancia(int*ruta,matrizGrafo* grafo,int inicio){
+    int distancia = 0;
+    int** matriz = grafo->adyacencias;
+    for(int i=0;i<grafo->vertices-1;i++){
+        distancia = distancia + matriz[inicio][ruta[i]];
+        inicio = ruta[i];
+    }
+    return distancia;
+}
+
+int calculoPeso(int*ruta,int*capacidad,matrizGrafo* grafo,int capacidadTotal,int inicio){
+    for(int i=0;i < grafo->vertices-1 ;i++){
+        capacidadTotal = capacidadTotal - 1;
+    }
+}
+
 int main(){
+    //clock_t start, finish, duration;
+    //start = clock();
+
+
+    //Archivo que contiene las conexiones del grafo
 	char* archivo= "conexiones.in";
-    printf("Lectura grafos\n\n");
     int vertices = lecturaVertices(archivo);
-    //int**insumos = (int**)malloc(vertices-1*sizeof(int*));
-
-
     printf("Vertices: %d\n",vertices);
+
+    int subsidio;
+    int *capacidad = (int*)malloc(sizeof(int)*vertices);
+    for(int i=0;i<vertices ;i++){
+        capacidad[i] = 0;
+    }
+
+
+    subsidio = lecturaInsumos("insumos.in",capacidad,subsidio);
+    int capacidadTotal;
+    capacidadTotal= calculoCapacidad(capacidad,vertices);
+
+    //int nuevaCapacidad =
+
     matrizGrafo* grafo = crearGrafoVacio(vertices);
     grafo = lecturaGrafo(archivo);
     printf("Matriz adyacencia\n");
     imprimirMatrizAdyacencia(grafo);
 
+    
+
+
+
+
+
+    //Se define el vértice inicial
+    int verticeInicial = 0;
     int* ruta=(int*)malloc(sizeof(int)*grafo->vertices);
+    ruta = dijkstra(grafo,verticeInicial);
+    int distanciaRecorrida;
+    distanciaRecorrida = calculoDistancia(ruta,grafo,0);
 
-    ruta = dijkstra(grafo,0);
 
-    printf("0,");
+    int costoTotal;
+    costoTotal = calculoCosto(distanciaRecorrida,capacidadTotal,subsidio);
+    printf("\nCosto: %d\n",costoTotal);
+
+
+    printf("Capacidad: %d ton\n",capacidadTotal);
+    printf("Subsidio: %d um\n",subsidio);
+    printf("\nRuta: ");
+    printf("%d->",verticeInicial);
     for(int i=0;i<grafo->vertices-1 ;i++){
-        printf("%d,",ruta[i]);
+        printf("%d->",ruta[i]);
     }
-    printf("\nSali Dijkstra\n");
+    //finish = clock();
+    //printf("process() took %f seconds to execute\n", ((double) (finish - start)) / CLOCKS_PER_SEC );
 	return 0;
 }
-
-
 
 
