@@ -44,7 +44,6 @@ Entradas: grafo, vértice
 Salida: lista
 Objetivo: obtener adyacentes de un vértice
 */
-
 listaAdyacencia* obtenerAdyacentes(matrizGrafo* grafo, int vertice){
 	listaAdyacencia* lista = crearListaVacia();
 	for(int i=0;i < grafo->vertices;i++){

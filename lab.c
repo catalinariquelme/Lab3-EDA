@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include "Grafo.h"
 
 /*
@@ -143,6 +142,9 @@ int* dijkstra(matrizGrafo* grafo,int inicio){
         ruta[posicionRuta] = minimo;
         posicionRuta++;
     }
+    free(visitado);
+    free(padre);
+    free(distancia);
     return ruta;
 }
 
@@ -152,10 +154,9 @@ Salida: costo (int)
 Objetivo: calcular el costo
 */
 int calculoCosto(int distancia,int peso,int subsidio){
+    //printf("d: %d   peso: %d    subsidio: %d\n",distancia,peso,subsidio);
     int costo;
-    printf("D: %d   peso: %d    sub: %d\n",distancia,peso,subsidio);
     costo = (distancia*peso)/subsidio;
-    printf("aaa: %d\n",costo);
     return costo;
 }
 
@@ -188,22 +189,11 @@ int calculoDistancia(int*ruta,matrizGrafo* grafo,int inicio){
 }
 
 /*
-Entradas: ruta(int*),capacidad(int*,grafo(matrizGrafo*),capacidadTotal(int),inicio(int* vértice por el cual se comienza)
-Salida: distancia (int)
-Objetivo: calcular la distancia recorrida al seguir una determinada ruta
-*/
-int calculoPeso(int*ruta,int*capacidad,matrizGrafo* grafo,int capacidadTotal,int inicio){
-    for(int i=0;i < grafo->vertices-1 ;i++){
-        capacidadTotal = capacidadTotal - 1;
-    }
-}
-
-/*
 Entradas: capacidadTotal(int), subsidio(int),ruta(int* ruta mínima), grafo(matrizGrafo*)
 Salida: -
 Objetivo: escribir un archivo con la información requerida
 */
-void salidaArchivo(int capacidadTotal,int subsidio,int* ruta,matrizGrafo *grafo){
+void salidaArchivo(int capacidadTotal,int subsidio,int* ruta,matrizGrafo *grafo,int costeMinimo){
   FILE* arch;
   arch = fopen("salida.out","w");
 
@@ -215,6 +205,11 @@ void salidaArchivo(int capacidadTotal,int subsidio,int* ruta,matrizGrafo *grafo)
 
     fputs("Subsidio: ",arch);
     itoa(subsidio,buffer,10);
+    fputs(buffer,arch);
+    fputs(" um\n",arch);
+
+    fputs("Coste minimo: ",arch);
+    itoa(costeMinimo,buffer,10);
     fputs(buffer,arch);
     fputs(" um\n",arch);
 
@@ -233,6 +228,7 @@ void salidaArchivo(int capacidadTotal,int subsidio,int* ruta,matrizGrafo *grafo)
 }
 
 int main(){
+    printf("LABORATORIO 3 EDA\n");
     //clock_t start, finish, duration;
     //start = clock();
 
@@ -250,7 +246,6 @@ int main(){
     int distanciaRecorrida;
     distanciaRecorrida = calculoDistancia(ruta,grafo,verticeInicial);
 
-
     //Se lee el archivo insumos con la finalidad de obtener la información respecto a esta
     int subsidio;
     int *capacidad = (int*)malloc(sizeof(int)*vertices);
@@ -263,14 +258,15 @@ int main(){
     int capacidadTotal;
     capacidadTotal= calculoCapacidad(capacidad,vertices);
 
+    // Se calcula el costo llamando a la función calculoCosto
     int costoTotal;
     costoTotal = calculoCosto(distanciaRecorrida,capacidadTotal,subsidio);
 
-
     //Se muestra por pantalla la información solicitada
-    printf("\nCapacidad: %d ton\n",capacidadTotal);
+    printf("------------------------\n");
+    printf("Capacidad: %d ton\n",capacidadTotal);
     printf("Subsidio: %d um\n",subsidio);
-    printf("Coste minimo: %d\n",costoTotal);
+    printf("Coste minimo: %d um\n",costoTotal);
     printf("Ruta: ");
     printf("Centro");
     for(int i=0;i<grafo->vertices ;i++){
@@ -279,10 +275,13 @@ int main(){
         }
         printf("->%d",ruta[i]);
     }
+    printf("\n------------------------\n");
     //Se impime la información mostrada por pantalla
-    salidaArchivo(capacidadTotal,subsidio,ruta,grafo);
-
+    salidaArchivo(capacidadTotal,subsidio,ruta,grafo,costoTotal);
+    printf("Se escribio un archivo con la informacion mostrada");
     //finish = clock();
     //printf("process() took %f seconds to execute\n", ((double) (finish - start)) / CLOCKS_PER_SEC );
-	return 0;
+	free(ruta);
+    free(capacidad);
+    return 0;
 }
